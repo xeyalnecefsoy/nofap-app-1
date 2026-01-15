@@ -1,9 +1,12 @@
 {
   "name": "Ascend - Addiction Recovery",
   "short_name": "Ascend",
+  "id": "/",
   "description": "A minimalist companion for overcoming addiction.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "icons": [

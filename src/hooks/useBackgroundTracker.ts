@@ -5,8 +5,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useSobriety } from "@/context/SobrietyContext";
 import { getRank } from "@/lib/ranks";
 
-// 1 second of silence (WAV) - widely supported and triggers media session
-const SILENT_AUDIO = "data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==";
+// Tiny valid silent MP3
+const SILENT_AUDIO = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjA5MQAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAP/zEAAAAAAA0gAAAAEAAAEAAAAAAAAAADX/5EAAAAAAA0gAAAAEAAAEAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD/+5EAAAAAAGUAAAAEAAAEAAAAAAAAAAAD";
 
 export function useBackgroundTracker(days: number, hours: number, minutes: number) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -19,7 +19,6 @@ export function useBackgroundTracker(days: number, hours: number, minutes: numbe
     if (!audioRef.current) {
         audioRef.current = new Audio(SILENT_AUDIO);
         audioRef.current.loop = true;
-        // Preload to ensure readiness
         audioRef.current.load();
     }
   }, []);
@@ -30,7 +29,6 @@ export function useBackgroundTracker(days: number, hours: number, minutes: numbe
     if (isActive) {
       audioRef.current.pause();
       setIsActive(false);
-      // Clear media session
       if ("mediaSession" in navigator) {
         navigator.mediaSession.playbackState = "none";
       }
@@ -38,14 +36,15 @@ export function useBackgroundTracker(days: number, hours: number, minutes: numbe
       try {
         await audioRef.current.play();
         setIsActive(true);
-      } catch (e) {
+      } catch (e: any) {
         console.error("Audio playback failed:", e);
-        // Fallback for interaction requirements: alert user if needed, but usually this is called on click so it should work.
+        // User feedback for "button not working"
+        alert(language === "az" ? "Xəta: Brauzer audio oynadılmasına icazə vermir. Zəhmət olmasa səhifəyə toxunun." : "Error: Browser blocked audio. Please interact with the page first.");
       }
     }
   };
 
-  // Update Media Session Metadata
+  // Update Media Session Metadata & Handlers
   useEffect(() => {
     if (!isActive || !startDate || !("mediaSession" in navigator)) return;
 
@@ -60,7 +59,7 @@ export function useBackgroundTracker(days: number, hours: number, minutes: numbe
         ? `Rütbə: ${rankLabel}`
         : `Rank: ${rankLabel}`;
     
-    const album = "Ascend - NoFap Tracker";
+    const album = "Ascend";
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,
@@ -70,6 +69,17 @@ export function useBackgroundTracker(days: number, hours: number, minutes: numbe
         { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
         { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
       ],
+    });
+
+    // CRITICAL: Registering action handlers is often required for the notification to show up on Android
+    navigator.mediaSession.setActionHandler('play', () => {
+        if(audioRef.current) { audioRef.current.play(); setIsActive(true); }
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+        if(audioRef.current) { audioRef.current.pause(); setIsActive(false); }
+    });
+    navigator.mediaSession.setActionHandler('stop', () => {
+         if(audioRef.current) { audioRef.current.pause(); setIsActive(false); }
     });
 
     navigator.mediaSession.playbackState = "playing";
