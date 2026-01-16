@@ -71,16 +71,19 @@ export function useBackgroundTracker(days: number, hours: number, minutes: numbe
       ],
     });
 
-    // CRITICAL: Registering action handlers is often required for the notification to show up on Android
-    navigator.mediaSession.setActionHandler('play', () => {
-        if(audioRef.current) { audioRef.current.play(); setIsActive(true); }
+    // CRITICAL for Android: Must handle at least one action for persistent notification
+    const noop = () => {};
+    navigator.mediaSession.setActionHandler('play', noop);
+    navigator.mediaSession.setActionHandler('pause', async () => {
+         // Allow pausing from notification to "stop" the mode
+         if(audioRef.current) { 
+            audioRef.current.pause(); 
+            setIsActive(false); 
+         }
     });
-    navigator.mediaSession.setActionHandler('pause', () => {
-        if(audioRef.current) { audioRef.current.pause(); setIsActive(false); }
-    });
-    navigator.mediaSession.setActionHandler('stop', () => {
-         if(audioRef.current) { audioRef.current.pause(); setIsActive(false); }
-    });
+    navigator.mediaSession.setActionHandler('seekto', noop); // Often required for valid media session
+    navigator.mediaSession.setActionHandler('previoustrack', noop); 
+    navigator.mediaSession.setActionHandler('nexttrack', noop);
 
     navigator.mediaSession.playbackState = "playing";
 

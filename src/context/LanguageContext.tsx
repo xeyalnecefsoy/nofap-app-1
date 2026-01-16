@@ -17,6 +17,13 @@ type Transitions = {
     stayStrong: string;
     endSession: string;
     appName: string;
+    restoreProgress: string;
+    manualEntry: string;
+    enterPreviousDuration: string;
+    beHonest: string;
+    confirm: string;
+    cancel: string;
+    resetOrSlip: string;
   };
 };
 
@@ -33,6 +40,13 @@ const translations: Transitions = {
     stayStrong: "STAY STRONG • ONE DAY AT A TIME",
     endSession: "End Session",
     appName: "Ascend",
+    restoreProgress: "Restore Progress",
+    manualEntry: "Manual Entry",
+    enterPreviousDuration: "Enter Previous Duration",
+    beHonest: "Be honest with yourself. This explains your journey.",
+    confirm: "Confirm",
+    cancel: "Cancel",
+    resetOrSlip: "Reset / I Slipped Up",
   },
   az: {
     readyTitle: "Yüksəlməyə hazırsan?",
@@ -46,6 +60,13 @@ const translations: Transitions = {
     stayStrong: "GÜCLÜ QAL • HƏR GÜN YENİ BİR QƏLƏBƏDİR",
     endSession: "Bitir",
     appName: "Ascend",
+    restoreProgress: "Proqressi Bərpa Et",
+    manualEntry: "Əl ilə Daxil Et",
+    enterPreviousDuration: "Öncəki Müddəti Daxil Edin",
+    beHonest: "Özünə qarşı dürüst ol. Bu sənin yolçuluğundur.",
+    confirm: "Təsdiqlə",
+    cancel: "Ləğv et",
+    resetOrSlip: "Sıfırla / Uduzdum",
   },
 };
 

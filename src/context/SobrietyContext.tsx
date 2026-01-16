@@ -7,6 +7,7 @@ type SobrietyContextType = {
   startTimer: () => void;
   resetTimer: () => void;
   stopTimer: () => void;
+  setStartDate: (date: Date) => void;
 };
 
 const SobrietyContext = createContext<SobrietyContextType | undefined>(undefined);
@@ -22,16 +23,20 @@ export function SobrietyProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+
+  const updateStartDate = (date: Date) => {
+    setStartDate(date);
+    localStorage.setItem("ascend_start_date", date.toISOString());
+  };
+
   const startTimer = () => {
     const now = new Date();
-    setStartDate(now);
-    localStorage.setItem("ascend_start_date", now.toISOString());
+    updateStartDate(now);
   };
 
   const resetTimer = () => {
     const now = new Date();
-    setStartDate(now);
-    localStorage.setItem("ascend_start_date", now.toISOString());
+    updateStartDate(now);
   };
 
   const stopTimer = () => {
@@ -40,7 +45,7 @@ export function SobrietyProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <SobrietyContext.Provider value={{ startDate, startTimer, resetTimer, stopTimer }}>
+    <SobrietyContext.Provider value={{ startDate, startTimer, resetTimer, stopTimer, setStartDate: updateStartDate }}>
       {children}
     </SobrietyContext.Provider>
   );

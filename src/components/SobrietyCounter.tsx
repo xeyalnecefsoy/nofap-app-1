@@ -9,6 +9,7 @@ import { Play, Square, ShieldAlert } from "lucide-react";
 import { RelapseWizard } from "@/components/RelapseWizard";
 import { PanicModal } from "@/components/PanicModal";
 import { DailyMotivation } from "@/components/DailyMotivation";
+import { LegacyStatsModal } from "@/components/LegacyStatsModal";
 import { useState, useEffect } from "react";
 import { getRank } from "@/lib/ranks";
 import { Bell, Radio } from "lucide-react";
@@ -20,6 +21,7 @@ export function SobrietyCounter() {
   const streak = useSobrietyTimer(startDate);
   const [isRelapseWizardOpen, setIsRelapseWizardOpen] = useState(false);
   const [isPanicOpen, setIsPanicOpen] = useState(false);
+  const [isLegacyModalOpen, setIsLegacyModalOpen] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState("default");
   
   const { toggleBackgroundMode, isActive: isBackgroundActive } = useBackgroundTracker(streak.days, streak.hours, streak.minutes);
@@ -47,7 +49,7 @@ export function SobrietyCounter() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center space-y-4"
+          className="text-center space-y-4 flex flex-col items-center"
         >
           <h2 className="text-xl md:text-2xl font-light text-muted-foreground">{t.readyTitle}</h2>
           <button
@@ -57,7 +59,15 @@ export function SobrietyCounter() {
             <Play className="w-5 h-5 fill-current" />
             <span className="text-center">{t.startJourney}</span>
           </button>
+
+          <button
+            onClick={() => setIsLegacyModalOpen(true)}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-4 border-b border-transparent hover:border-foreground/20 pb-0.5"
+          >
+            {t.restoreProgress}
+          </button>
         </motion.div>
+        <LegacyStatsModal isOpen={isLegacyModalOpen} onClose={() => setIsLegacyModalOpen(false)} />
       </div>
     );
   }
@@ -125,7 +135,7 @@ export function SobrietyCounter() {
            onClick={() => setIsRelapseWizardOpen(true)}
            className="text-[10px] text-muted-foreground/20 hover:text-destructive/50 transition-colors cursor-pointer"
         >
-          Reset / I Slipped Up
+          {t.resetOrSlip}
         </button>
       </div>
 
@@ -139,10 +149,7 @@ export function SobrietyCounter() {
         onClose={() => setIsPanicOpen(false)}
       />
 
-      <PanicModal
-        isOpen={isPanicOpen}
-        onClose={() => setIsPanicOpen(false)}
-      />
+
 
       <div className="w-full pt-8 pb-4">
         <DailyMotivation />
